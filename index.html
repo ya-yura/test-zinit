@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zinit - Dashboard закупщика</title>
+  <style>
+    :root {
+      --bg: #f3f5f7;
+      --surface: #ffffff;
+      --surface-alt: #f8f9fb;
+      --text: #111827;
+      --text-soft: #5b6472;
+      --border: #dbe1e8;
+      --accent: #c92a2a;
+      --accent-soft: #fbecee;
+      --ok: #0f7a37;
+      --warn: #b66100;
+      --shadow: 0 3px 16px rgba(16, 24, 40, 0.06);
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+      line-height: 1.35;
+    }
+
+    .page {
+      max-width: 1360px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 650;
+    }
+
+    .subtitle {
+      margin: 4px 0 0;
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    button, .btn {
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--surface);
+      color: var(--text);
+      padding: 8px 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    button:hover, .btn:hover { background: var(--surface-alt); }
+
+    .btn-accent {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
+    .btn-accent:hover { background: #b92525; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .span-12 { grid-column: span 12; }
+    .span-8 { grid-column: span 8; }
+    .span-4 { grid-column: span 4; }
+    .span-6 { grid-column: span 6; }
+    .span-3 { grid-column: span 3; }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      min-height: 120px;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 17px;
+      font-weight: 650;
+    }
+
+    .hint { color: var(--text-soft); font-size: 12px; }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .kpi {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    .kpi-title {
+      font-size: 12px;
+      color: var(--text-soft);
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .kpi-meta {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .kpi-action {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid var(--border);
+    }
+
+    .kpi-link {
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: #1f2937;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: underline;
+      text-decoration-color: #aeb8c6;
+      text-underline-offset: 2px;
+    }
+
+    .kpi-link:hover {
+      color: var(--accent);
+      text-decoration-color: var(--accent);
+      background: transparent;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 11px;
+      background: #fff;
+      color: var(--text-soft);
+    }
+
+    .pill-risk {
+      border-color: #f2c8cd;
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+
+    .segmented {
+      display: inline-flex;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      overflow: hidden;
+    }
+
+    .segmented button {
+      border: 0;
+      border-right: 1px solid var(--border);
+      border-radius: 0;
+      margin: 0;
+      background: #fff;
+      padding: 7px 10px;
+      font-size: 12px;
+    }
+
+    .segmented button:last-child { border-right: 0; }
+    .segmented button.active {
+      background: var(--surface-alt);
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .state-line {
+      margin-bottom: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--surface-alt);
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+
+    .state-line.error {
+      border-color: #efbcc4;
+      background: #fff3f5;
+      color: #8c2029;
+    }
+
+    .state-line.warning {
+      border-color: #f2d19e;
+      background: #fff7ea;
+      color: #8c5000;
+    }
+
+    .state-line.success {
+      border-color: #b8dfc1;
+      background: #eefaf1;
+      color: #156332;
+    }
+
+    .hidden { display: none !important; }
+
+    .ai-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .ai-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 12px;
+    }
+
+    .ai-item.critical {
+      border-color: #e5b7bc;
+      background: #fff7f8;
+    }
+
+    .ai-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .ai-action {
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .ai-meta {
+      font-size: 12px;
+      color: var(--text-soft);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ai-score {
+      height: fit-content;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 5px 8px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-soft);
+    }
+
+    .ai-actions {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .status-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .status-col {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .status-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-title {
+      font-size: 13px;
+      font-weight: 650;
+    }
+
+    .status-count {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .status-risk {
+      font-size: 11px;
+      color: var(--text-soft);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 3px 7px;
+      background: var(--surface-alt);
+    }
+
+    .status-risk.high {
+      color: var(--accent);
+      border-color: #f2c8cd;
+      background: var(--accent-soft);
+    }
+
+    .status-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .status-chip {
+      max-width: 100%;
+      font-size: 11px;
+      color: var(--text-soft);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: #fff;
+      padding: 2px 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .status-foot {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--text-soft);
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .create-box {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      background: #fff;
+      display: grid;
+      gap: 8px;
+    }
+
+    .create-box h3 {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--text);
+      padding: 8px;
+      font-size: 13px;
+    }
+
+    textarea { resize: vertical; min-height: 90px; }
+
+    .trend {
+      font-size: 11px;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+    .trend.up { color: var(--warn); }
+    .trend.neutral { color: var(--text-soft); }
+
+    .ai-plan {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface-alt);
+      padding: 12px;
+      margin-top: 10px;
+    }
+    .ai-plan-head span:last-child {
+      font-weight: 700;
+    }
+    .ai-stage {
+      display: flex;
+      gap: 8px;
+      font-size: 12px;
+      margin-bottom: 6px;
+      align-items: baseline;
+    }
+    .ai-stage:last-child { margin-bottom: 0; }
+    .ai-stage-num {
+      color: var(--text-soft);
+      font-family: monospace;
+    }
+    .ai-plan-head span:last-child { font-weight: 700; }
+
+    .analytics {
+      display: grid;
+      gap: 10px;
+    }
+
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      padding: 10px;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--surface-alt);
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .bar span {
+      display: block;
+      height: 100%;
+      background: #334155;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 390px;
+      height: 100vh;
+      background: #fff;
+      border-left: 1px solid var(--border);
+      box-shadow: -12px 0 28px rgba(0, 0, 0, 0.12);
+      transform: translateX(100%);
+      transition: transform .2s ease;
+      z-index: 10;
+      padding: 16px;
+      overflow: auto;
+    }
+
+    .drawer.open { transform: translateX(0); }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.34);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      z-index: 9;
+    }
+
+    .overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (max-width: 1080px) {
+      .span-8, .span-4, .span-6, .span-3 { grid-column: span 12; }
+      .kpi-grid { grid-template-columns: 1fr 1fr; }
+      .status-grid { grid-template-columns: 1fr; }
+      .split { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 640px) {
+      .status-grid { grid-template-columns: 1fr; }
+      .kpi-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div>
+        <h1 class="title">Dashboard закупщика</h1>
+        <p class="subtitle" id="subtitleDate">Операционный центр закупок</p>
+      </div>
+      <div class="toolbar">
+        <button id="refreshData">Обновить данные</button>
+        <button class="btn-accent" id="openCreateMain">Создать закупку</button>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section class="card span-12" id="summarySection">
+        <div class="card-head">
+          <h2>Операционная сводка</h2>
+          <span class="pill" id="syncStatus">Синхронизировано только что</span>
+        </div>
+        <div class="kpi-grid">
+          <div class="kpi">
+            <div class="kpi-title">Активные закупки</div>
+            <div class="kpi-value" id="kpiActive">-</div>
+            <div class="kpi-meta">в работе прямо сейчас</div>
+            <div class="kpi-action">
+              <button class="kpi-link" data-kpi-action="active">Открыть статусный контур</button>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-title">Критичные действия</div>
+            <div class="kpi-value" id="kpiCritical">-</div>
+            <div class="kpi-meta">нужна реакция сегодня</div>
+            <div class="kpi-action">
+              <button class="kpi-link" data-kpi-action="critical">Разобрать критичные сейчас</button>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-title">Средний time-to-action</div>
+            <div class="kpi-value" id="kpiTta">-</div>
+            <div class="kpi-meta">по high-risk задачам</div>
+            <div class="kpi-action">
+              <button class="kpi-link" data-kpi-action="tta">Ускорить реакции в 48ч</button>
+            </div>
+          </div>
+          <div class="kpi">
+            <div class="kpi-title">Доля просрочек</div>
+            <div class="kpi-value" id="kpiOverdue">-</div>
+            <div class="kpi-meta">по активным закупкам</div>
+            <div class="kpi-action">
+              <button class="kpi-link" data-kpi-action="overdue">Снять просрочки</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card span-8" id="aiSection">
+        <div class="card-head">
+          <div>
+            <h2>Что сделать сейчас</h2>
+            <div class="hint">Приоритизация по риску: дедлайн, блокер, бизнес-влияние</div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span class="pill pill-risk" id="riskPill">Риск-фокус активен</span>
+            <div class="segmented" id="aiFilter">
+              <button class="active" data-filter="all">Все</button>
+              <button data-filter="critical">Критичные</button>
+              <button data-filter="soon">48 часов</button>
+            </div>
+          </div>
+        </div>
+        <div class="state-line hidden" id="aiStateLine"></div>
+        <div class="ai-list" id="aiList"></div>
+      </section>
+
+      <section class="card span-4" id="statusSection">
+        <div class="card-head">
+          <div>
+            <h2>Статусы закупок</h2>
+            <div class="hint">Компактная лента: объем, риск и быстрый переход</div>
+          </div>
+        </div>
+        <div class="state-line hidden" id="statusStateLine"></div>
+        <div class="status-grid" id="statusGrid"></div>
+      </section>
+
+      <section class="card span-8" id="createSection">
+        <div class="card-head">
+          <div>
+            <h2>Создание новой закупки</h2>
+            <div class="hint">Выберите сценарий старта в зависимости от определенности задачи</div>
+          </div>
+          <button class="btn-accent" id="createPrimary">Создать закупку</button>
+        </div>
+        <div class="state-line hidden" id="createStateLine"></div>
+        <div class="split">
+          <div class="create-box">
+            <h3>Классическая форма</h3>
+            <div class="hint">Для типовых закупок с понятной структурой</div>
+            <label class="hint">Название закупки</label>
+            <input id="classicTitle" placeholder="Поставка серверного оборудования" />
+            <label class="hint">Категория</label>
+            <input id="classicCategory" placeholder="IT / Логистика / Офис" />
+            <button id="createClassic">Создать черновик</button>
+          </div>
+          <div class="create-box">
+            <h3>Создать через AI</h3>
+            <div class="hint">Для новых или комплексных задач с неполными требованиями</div>
+            <label class="hint">Кратко опишите потребность</label>
+            <textarea id="aiPrompt" placeholder="Нужна закупка ноутбуков для 3 офисов, поставка в этом квартале, гарантия 36 месяцев..."></textarea>
+            <button id="generateAiPlan">Сформировать структуру</button>
+            <div id="aiGeneratedPlan" class="hidden"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card span-4" id="analyticsSection">
+        <div class="card-head">
+          <div>
+            <h2>Аналитический обзор</h2>
+            <div class="hint">Компактная оценка потока и эффективности</div>
+          </div>
+        </div>
+        <div class="state-line hidden" id="analyticsStateLine"></div>
+        <div class="analytics">
+          <div class="panel">
+            <div class="metric-row"><strong>Воронка по статусам</strong><span class="hint">количество</span></div>
+            <div id="funnelRows"></div>
+          </div>
+          <div class="panel">
+            <div class="metric-row"><span>Средняя длительность этапов</span><strong id="avgDuration">-</strong></div>
+            <div class="metric-row"><span>Новые привлечённые поставщики (30 дней)</span><strong id="suppliersCount">-</strong></div>
+            <div class="metric-row"><span>Доля просрочек</span><strong id="overdueRate">-</strong></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+  <aside class="drawer" id="drawer">
+    <h2 style="margin:0 0 8px;">Детали</h2>
+    <div class="hint" id="drawerContent">Выберите действие или статус для просмотра деталей.</div>
+    <div style="margin-top: 14px; display:flex; gap:8px;">
+      <button class="btn-accent" id="drawerGo">Открыть карточку</button>
+      <button id="drawerClose">Закрыть</button>
+    </div>
+  </aside>
+
+  <script>
+    const statusLabels = {
+      draft: "Черновики",
+      applications: "Приём заявок",
+      decision: "Принятие решения",
+      closed: "Закрытые"
+    };
+
+    const appState = {
+      loading: false,
+      aiFilter: "all",
+      connectionIssue: false
+    };
+
+    const procurementData = [
+      {
+        id: 1,
+        name: "Серверы для дата-центра",
+        status: "decision",
+        daysToDeadline: 1,
+        blocker: true,
+        businessRisk: 5,
+        pendingAction: "Утвердить финальный протокол",
+        suppliers: 7,
+        newSuppliers30d: 2,
+        stageDaysAvg: 9
+      },
+      {
+        id: 2,
+        name: "Лицензии кибербезопасности",
+        status: "applications",
+        daysToDeadline: -2,
+        blocker: true,
+        businessRisk: 4,
+        pendingAction: "Закрыть приём заявок и перевести в решение",
+        suppliers: 4,
+        newSuppliers30d: 1,
+        stageDaysAvg: 12
+      },
+      {
+        id: 3,
+        name: "Ноутбуки для филиалов",
+        status: "draft",
+        daysToDeadline: 6,
+        blocker: false,
+        businessRisk: 3,
+        pendingAction: "Проверить требования и опубликовать",
+        suppliers: 0,
+        newSuppliers30d: 0,
+        stageDaysAvg: 5
+      },
+      {
+        id: 4,
+        name: "Логистика складов",
+        status: "applications",
+        daysToDeadline: 2,
+        blocker: false,
+        businessRisk: 4,
+        pendingAction: "Ответить на вопросы поставщиков",
+        suppliers: 11,
+        newSuppliers30d: 3,
+        stageDaysAvg: 7
+      },
+      {
+        id: 5,
+        name: "Офисная мебель HQ",
+        status: "closed",
+        daysToDeadline: 0,
+        blocker: false,
+        businessRisk: 2,
+        pendingAction: "",
+        suppliers: 8,
+        newSuppliers30d: 1,
+        stageDaysAvg: 10
+      },
+      {
+        id: 6,
+        name: "Резервное копирование",
+        status: "decision",
+        daysToDeadline: 4,
+        blocker: false,
+        businessRisk: 5,
+        pendingAction: "Согласовать SLA и финальные условия",
+        suppliers: 3,
+        newSuppliers30d: 1,
+        stageDaysAvg: 8
+      }
+    ];
+
+    function riskScore(item) {
+      const deadlineRisk =
+        item.daysToDeadline < 0
+          ? 50 + Math.min(Math.abs(item.daysToDeadline) * 6, 30)
+          : Math.max(0, 30 - item.daysToDeadline * 4);
+      const blockerRisk = item.blocker ? 30 : 0;
+      const businessRisk = item.businessRisk * 8;
+      return deadlineRisk + blockerRisk + businessRisk;
+    }
+
+    function formatDate() {
+      const now = new Date();
+      const date = now.toLocaleDateString("ru-RU", { day: "2-digit", month: "long", year: "numeric" });
+      const time = now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+      document.getElementById("subtitleDate").textContent = "Операционный центр закупок - " + date + ", " + time;
+    }
+
+    function getActiveItems() {
+      return procurementData.filter((item) => item.status !== "closed");
+    }
+
+    function getPrioritizedActions() {
+      return getActiveItems()
+        .map((item) => ({ ...item, score: riskScore(item) }))
+        .sort((a, b) => b.score - a.score);
+    }
+
+    function setStateLine(id, type, message) {
+      const el = document.getElementById(id);
+      el.className = "state-line";
+      if (type) el.classList.add(type);
+      if (!message) {
+        el.classList.add("hidden");
+        el.textContent = "";
+        return;
+      }
+      el.textContent = message;
+      el.classList.remove("hidden");
+    }
+
+    function renderKpis() {
+      const active = getActiveItems();
+      const prioritized = getPrioritizedActions();
+      const critical = prioritized.filter((x) => x.daysToDeadline < 0 || x.score >= 95).length;
+      const overdue = active.filter((x) => x.daysToDeadline < 0).length;
+      const overdueRate = active.length ? Math.round((overdue / active.length) * 100) : 0;
+      const tta = critical ? "1.8ч" : "3.2ч";
+
+      document.getElementById("kpiActive").textContent = String(active.length);
+      document.getElementById("kpiCritical").textContent = String(critical);
+      document.getElementById("kpiTta").textContent = tta;
+      document.getElementById("kpiOverdue").textContent = overdueRate + "%";
+
+      if (critical > 0) {
+        document.getElementById("riskPill").textContent = critical + " критичных в фокусе";
+        document.getElementById("riskPill").classList.add("pill-risk");
+      } else {
+        document.getElementById("riskPill").textContent = "Критичных задач нет";
+        document.getElementById("riskPill").classList.remove("pill-risk");
+      }
+    }
+
+    function renderAiBlock() {
+      const list = document.getElementById("aiList");
+      list.innerHTML = "";
+
+      if (appState.loading) {
+        setStateLine("aiStateLine", null, "AI рассчитывает приоритеты...");
+        return;
+      }
+
+      const prioritized = getPrioritizedActions();
+      let filtered = prioritized;
+
+      if (appState.aiFilter === "critical") {
+        filtered = prioritized.filter((item) => item.daysToDeadline < 0 || item.score >= 95);
+      } else if (appState.aiFilter === "soon") {
+        filtered = prioritized.filter((item) => item.daysToDeadline <= 2);
+      }
+
+      if (appState.connectionIssue) {
+        setStateLine("aiStateLine", "error", "Часть AI-сигналов недоступна. Применена безопасная сортировка по дедлайну.");
+        filtered = [...getActiveItems()].sort((a, b) => a.daysToDeadline - b.daysToDeadline).map((x) => ({ ...x, score: riskScore(x) }));
+      } else if (filtered.length > 9) {
+        setStateLine("aiStateLine", "warning", "Перегрузка задач: показаны наиболее рискованные действия.");
+      } else if (!filtered.length) {
+        setStateLine("aiStateLine", "success", "Сейчас нет срочных действий в выбранном фильтре.");
+      } else {
+        setStateLine("aiStateLine", null, "");
+      }
+
+      filtered.slice(0, 6).forEach((item) => {
+        const row = document.createElement("article");
+        const isCritical = item.daysToDeadline < 0 || item.score >= 95;
+        row.className = "ai-item" + (isCritical ? " critical" : "");
+
+        const reasons = [];
+        if (item.daysToDeadline < 0) reasons.push("просрочка " + Math.abs(item.daysToDeadline) + " дн.");
+        else if (item.daysToDeadline <= 2) reasons.push("дедлайн <= 48ч");
+        if (item.blocker) reasons.push("блокер");
+        if (item.businessRisk >= 4) reasons.push("высокий бизнес-риск");
+
+        row.innerHTML = `
+          <div>
+            <div class="ai-title">${item.name}</div>
+            <div class="ai-action">${item.pendingAction || "Проверить статус закупки"}</div>
+            <div class="ai-meta">
+              <span>Причина: ${reasons.join(", ") || "плановая задача"}</span>
+              <span>Срок: ${item.daysToDeadline < 0 ? "немедленно" : "через " + item.daysToDeadline + " дн."}</span>
+            </div>
+          </div>
+          <div class="ai-score">RISK ${item.score}</div>
+          <div class="ai-actions">
+            <button data-open-task="${item.id}" class="btn-accent">Перейти</button>
+          </div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function renderStatusBlock() {
+      const wrap = document.getElementById("statusGrid");
+      wrap.innerHTML = "";
+
+      if (appState.loading) {
+        setStateLine("statusStateLine", null, "Загружаем статусы закупок...");
+        return;
+      }
+
+      const groups = {
+        draft: procurementData.filter((x) => x.status === "draft"),
+        applications: procurementData.filter((x) => x.status === "applications"),
+        decision: procurementData.filter((x) => x.status === "decision"),
+        closed: procurementData.filter((x) => x.status === "closed")
+      };
+
+      if (!getActiveItems().length) {
+        setStateLine("statusStateLine", "success", "Активных закупок нет.");
+        return;
+      }
+
+      const decisionOverload = groups.decision.length >= 6;
+      if (decisionOverload) {
+        setStateLine("statusStateLine", "warning", "Риск накопления: слишком много закупок в принятии решения.");
+      } else {
+        setStateLine("statusStateLine", null, "");
+      }
+
+      const ordered = ["draft", "applications", "decision", "closed"];
+      
+      // Mock trends
+      const trends = { draft: "+2", applications: "+1", decision: "0", closed: "+3" };
+
+      ordered.forEach((key) => {
+        const arr = groups[key];
+        const sorted = arr
+          .map((item) => ({ ...item, score: riskScore(item) }))
+          .sort((a, b) => b.score - a.score);
+        const criticalInside = sorted.filter((item) => item.daysToDeadline < 0 || item.score >= 95).length;
+        const topItems = sorted.slice(0, 3);
+        const trendVal = trends[key];
+        const isUp = trendVal !== "0";
+
+        const col = document.createElement("section");
+        col.className = "status-col";
+        col.innerHTML = `
+          <div class="status-head">
+            <div class="status-title">${statusLabels[key]}</div>
+            <div class="trend ${isUp ? 'up' : 'neutral'}">${isUp ? '↑ ' + trendVal : '—'}</div>
+          </div>
+          <div style="display:flex; align-items:baseline; gap:6px; margin-bottom:4px;">
+             <div class="status-count">${arr.length}</div>
+             ${criticalInside ? `<div class="status-risk high">${criticalInside} крит.</div>` : ''}
+          </div>
+          <div class="status-chips">
+            ${
+              topItems.length
+                ? topItems.map((item) => `<span class="status-chip">${item.name}</span>`).join("")
+                : "<span class='status-chip'>Нет закупок</span>"
+            }
+          </div>
+          <div class="status-foot">
+            <span class="hint">Top-3</span>
+            <button data-open-list="${key}">Открыть</button>
+          </div>
+        `;
+        wrap.appendChild(col);
+      });
+    }
+
+    function renderCreateBlock() {
+      if (appState.loading) {
+        setStateLine("createStateLine", null, "Проверяем доступность шаблонов и правил согласования...");
+        return;
+      }
+
+      const active = getActiveItems().length;
+      if (active > 18) {
+        setStateLine("createStateLine", "warning", "Высокая нагрузка: перед запуском новой закупки завершите приоритетные задачи.");
+      } else {
+        setStateLine("createStateLine", null, "");
+      }
+    }
+
+    function renderAnalyticsBlock() {
+      const rows = document.getElementById("funnelRows");
+      const avgDuration = document.getElementById("avgDuration");
+      const suppliersCount = document.getElementById("suppliersCount");
+      const overdueRate = document.getElementById("overdueRate");
+      rows.innerHTML = "";
+
+      if (appState.loading) {
+        setStateLine("analyticsStateLine", null, "Пересчитываем показатели...");
+        avgDuration.textContent = "-";
+        suppliersCount.textContent = "-";
+        overdueRate.textContent = "-";
+        return;
+      }
+
+      const groups = [
+        { key: "draft", label: statusLabels.draft },
+        { key: "applications", label: statusLabels.applications },
+        { key: "decision", label: statusLabels.decision },
+        { key: "closed", label: statusLabels.closed }
+      ];
+
+      const max = Math.max(...groups.map((g) => procurementData.filter((x) => x.status === g.key).length), 1);
+      groups.forEach((group) => {
+        const count = procurementData.filter((x) => x.status === group.key).length;
+        const width = Math.round((count / max) * 100);
+        rows.innerHTML += `
+          <div class="metric-row"><span>${group.label}</span><strong>${count}</strong></div>
+          <div class="bar"><span style="width: ${width}%"></span></div>
+        `;
+      });
+
+      const avg = Math.round(procurementData.reduce((acc, i) => acc + i.stageDaysAvg, 0) / procurementData.length);
+      const suppliers = procurementData.reduce((acc, i) => acc + i.newSuppliers30d, 0);
+      const active = getActiveItems();
+      const overdue = active.filter((x) => x.daysToDeadline < 0).length;
+      const rate = active.length ? Math.round((overdue / active.length) * 100) : 0;
+
+      avgDuration.textContent = avg + " дней";
+      suppliersCount.textContent = String(suppliers);
+      overdueRate.textContent = rate + "%";
+
+      if (rate > 20) {
+        setStateLine("analyticsStateLine", "error", "Критическое отклонение: доля просрочек выше целевого порога.");
+      } else if (rate > 10) {
+        setStateLine("analyticsStateLine", "warning", "Есть риск роста просрочек. Проверьте блокерные закупки.");
+      } else if (!active.length) {
+        setStateLine("analyticsStateLine", "success", "Недостаточно активных данных для оценки тренда.");
+      } else {
+        setStateLine("analyticsStateLine", null, "");
+      }
+    }
+
+    function renderAll() {
+      formatDate();
+      renderKpis();
+      renderAiBlock();
+      renderStatusBlock();
+      renderCreateBlock();
+      renderAnalyticsBlock();
+    }
+
+    function openDrawer(content, targetName) {
+      const drawer = document.getElementById("drawer");
+      const overlay = document.getElementById("overlay");
+      document.getElementById("drawerContent").innerHTML = content;
+      drawer.classList.add("open");
+      overlay.classList.add("open");
+      document.getElementById("drawerGo").onclick = () => {
+        alert("Переход в карточку: " + targetName);
+      };
+    }
+
+    function closeDrawer() {
+      document.getElementById("drawer").classList.remove("open");
+      document.getElementById("overlay").classList.remove("open");
+    }
+
+    function setAiFilter(filter) {
+      appState.aiFilter = filter;
+      document.querySelectorAll("#aiFilter button").forEach((btn) => btn.classList.remove("active"));
+      const selected = document.querySelector("#aiFilter button[data-filter='" + filter + "']");
+      if (selected) selected.classList.add("active");
+      renderAiBlock();
+    }
+
+    function goToSection(id) {
+      const target = document.getElementById(id);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function handleKpiAction(action) {
+      if (action === "active") {
+        goToSection("statusSection");
+        return;
+      }
+
+      if (action === "critical") {
+        setAiFilter("critical");
+        goToSection("aiSection");
+        return;
+      }
+
+      if (action === "tta") {
+        setAiFilter("soon");
+        goToSection("aiSection");
+        setStateLine("aiStateLine", "warning", "Фокус на задачах с дедлайном до 48 часов для сокращения time-to-action.");
+        return;
+      }
+
+      if (action === "overdue") {
+        const overdueItems = getActiveItems().filter((item) => item.daysToDeadline < 0);
+        setAiFilter("critical");
+        goToSection("aiSection");
+        if (!overdueItems.length) {
+          openDrawer(
+            "<p><strong>Просроченные закупки отсутствуют</strong></p><p>Сфокусируйтесь на предупреждении рисков через блок критичных действий.</p>",
+            "Просрочки"
+          );
+          return;
+        }
+        openDrawer(
+          "<p><strong>Просроченные закупки</strong></p><ol>" +
+            overdueItems.map((item) => "<li>" + item.name + " — " + Math.abs(item.daysToDeadline) + " дн. просрочки</li>").join("") +
+            "</ol><p class='hint'>Рекомендуем начать с верхних задач в AI-очереди.</p>",
+          "Просрочки"
+        );
+      }
+    }
+
+    function createClassicProcurement() {
+      const title = document.getElementById("classicTitle").value.trim();
+      const category = document.getElementById("classicCategory").value.trim().toLowerCase();
+      if (!title) {
+        alert("Введите название закупки.");
+        return;
+      }
+      const nextId = procurementData.reduce((max, i) => Math.max(max, i.id), 0) + 1;
+      procurementData.unshift({
+        id: nextId,
+        name: title,
+        status: "draft",
+        daysToDeadline: 7,
+        blocker: false,
+        businessRisk: category.includes("it") || category.includes("инфра") ? 4 : 3,
+        pendingAction: "Заполнить требования и опубликовать",
+        suppliers: 0,
+        newSuppliers30d: 0,
+        stageDaysAvg: 5
+      });
+      renderAll();
+      alert("Черновик создан.");
+    }
+
+    function generateAiPlan() {
+      const prompt = document.getElementById("aiPrompt").value.trim();
+      if (!prompt) {
+        alert("Добавьте описание закупки.");
+        return;
+      }
+      const complexity = prompt.length > 120 ? "высокая" : "средняя";
+      const risk = /сервер|безопас|sla|инфра|крит/i.test(prompt) ? 5 : 3;
+      const out = document.getElementById("aiGeneratedPlan");
+      
+      const sla = complexity === "высокая" ? "14 дней" : "10 дней";
+      
+      let html = `<div class="ai-plan">
+        <div class="ai-plan-head">
+          <span>AI-структура закупки</span>
+          <span style="color:${risk > 3 ? 'var(--accent)' : 'var(--ok)'}">Риск: ${risk}/5</span>
+        </div>
+        <div class="ai-stage"><span class="ai-stage-num">01.</span> Уточнение требований и критериев оценки</div>
+        <div class="ai-stage"><span class="ai-stage-num">02.</span> Публикация и сбор заявок</div>
+        <div class="ai-stage"><span class="ai-stage-num">03.</span> Технико-коммерческая оценка</div>
+        <div class="ai-stage"><span class="ai-stage-num">04.</span> Финальное решение и контракт</div>
+        <div style="margin-top:8px; font-size:11px; color:var(--text-soft);">
+          Оценка сложности: <strong>${complexity}</strong> · Рекомендуемый SLA: <strong>${sla}</strong>
+        </div>
+        <button class="btn-accent" style="width:100%; margin-top:8px; padding:6px;" onclick="createClassicProcurement()">Создать черновик по этой структуре</button>
+      </div>`;
+      
+      out.innerHTML = html;
+      out.classList.remove("hidden");
+    }
+
+    function simulateRefresh() {
+      appState.loading = true;
+      appState.connectionIssue = false;
+      document.getElementById("syncStatus").textContent = "Синхронизация...";
+      renderAll();
+
+      setTimeout(() => {
+        const hasError = Math.random() < 0.2;
+        appState.loading = false;
+        appState.connectionIssue = hasError;
+        document.getElementById("syncStatus").textContent = hasError
+          ? "Синхронизировано с ограничениями"
+          : "Синхронизировано " + new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+        renderAll();
+      }, 900);
+    }
+
+    document.getElementById("refreshData").addEventListener("click", simulateRefresh);
+    document.getElementById("createPrimary").addEventListener("click", () => document.getElementById("classicTitle").focus());
+    document.getElementById("openCreateMain").addEventListener("click", () => document.getElementById("classicTitle").focus());
+    document.getElementById("createClassic").addEventListener("click", createClassicProcurement);
+    document.getElementById("generateAiPlan").addEventListener("click", generateAiPlan);
+    document.getElementById("overlay").addEventListener("click", closeDrawer);
+    document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+
+    document.addEventListener("click", (e) => {
+      const kpiActionBtn = e.target.closest("[data-kpi-action]");
+      if (kpiActionBtn) {
+        handleKpiAction(kpiActionBtn.dataset.kpiAction);
+        return;
+      }
+
+      const filterBtn = e.target.closest("[data-filter]");
+      if (filterBtn) {
+        setAiFilter(filterBtn.dataset.filter);
+        return;
+      }
+
+      const taskBtn = e.target.closest("[data-open-task]");
+      if (taskBtn) {
+        const id = Number(taskBtn.dataset.openTask);
+        const task = procurementData.find((x) => x.id === id);
+        if (task) {
+          openDrawer(
+            "<p><strong>" + task.name + "</strong></p>" +
+            "<p>Следующее действие: " + task.pendingAction + "</p>" +
+            "<p>Срок: " + (task.daysToDeadline < 0 ? "просрочено" : "через " + task.daysToDeadline + " дн.") + "</p>" +
+            "<p>AI risk score: <strong>" + riskScore(task) + "</strong></p>" +
+            "<p class='hint'>Приоритет рассчитан по сроку, блокерам и бизнес-риску.</p>",
+            task.name
+          );
+        }
+        return;
+      }
+
+      const listBtn = e.target.closest("[data-open-list]");
+      if (listBtn) {
+        const status = listBtn.dataset.openList;
+        openDrawer(
+          "<p><strong>" + statusLabels[status] + "</strong></p>" +
+          "<p>Открытие полного списка закупок в выбранном статусе.</p>",
+          statusLabels[status]
+        );
+      }
+    });
+
+    renderAll();
+  </script>
+</body>
+</html>
